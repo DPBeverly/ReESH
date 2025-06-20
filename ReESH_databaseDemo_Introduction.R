@@ -157,20 +157,53 @@ RetentionCurve_files <- list.files(path = root_dir, pattern = "_SoilWaterRetenti
 
 ##//Read and combine all CSVs into a single data frame
 SWRC_df <- RetentionCurve_files %>%
-  lapply(read.csv, stringsAsFactors = FALSE) #%>%
-  bind_rows()  # Adds a column to identify source file (optional)
+  lapply(read.csv, stringsAsFactors = FALSE)
 
-  str(SWRC_df)
+##//Update the plots to being factors not integers 
 for(i in 1:length(SWRC_df)){ 
   SWRC_df[[i]]$Plot <- as.factor(SWRC_df[[i]]$Plot)
   }
 
+##//Combine the lists into a single dataframe
 SWRC_df <- bind_rows(SWRC_df)
+
 ##//You can save the compiled dataframe as a CSV if you would like to work with Excel or other software
 # output_dir <- "D:/Dropbox/Projects/Indiana/SoilLab"  ##// update with you directory
 # write.csv(SWRC_df, paste(output_dir, "SWRC_Compiled.csv", sep = "/"), row.names = FALSE)
 
+##//Making depths a factor 
+SWRC_df$DepthFactor <- ifelse(SWRC_df$Depth_cm>10, "Deep", SWRC_df$Depth_cm)
+SWRC_df$DepthFactor <- as.factor(SWRC_df$DepthFactor)
 
 ##//Simple plots with soil water retention curves
+
+##//Plot 7
+ggplot() +
+  geom_point(data = SWRC_df,
+             aes(x = Vol_Water, y = log10(MPa_Abs), color = DepthFactor),
+             show.legend = TRUE,  size = 3, alpha = 1) +
+  ylab(expression(paste("Log10 Soil Water Potential [ MPa] " ))) +
+  xlab(expression(paste("Soil Volumetric Water Content [ % ] " ))) +
+  theme(legend.position="right",
+        axis.text=element_text(size=30),
+        axis.title=element_text(size=30),
+        legend.title=element_text(size=30),
+        legend.text=element_text(size=30),
+        axis.text.x = element_text(angle = 0, vjust = 0.7, hjust=0.7))
+
+##//Plot 8
+ggplot() +
+  geom_point(data = SWRC_df,
+             aes(x = Vol_Water, y = log10(MPa_Abs), color = Site),
+             show.legend = TRUE,  size = 3, alpha = 1) +
+  ylab(expression(paste("Log10 Soil Water Potential [ MPa] " ))) +
+  xlab(expression(paste("Soil Volumetric Water Content [ % ] " ))) +
+  theme(legend.position="right",
+        axis.text=element_text(size=30),
+        axis.title=element_text(size=30),
+        legend.title=element_text(size=30),
+        legend.text=element_text(size=30),
+        axis.text.x = element_text(angle = 0, vjust = 0.7, hjust=0.7))
+
 
 
